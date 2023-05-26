@@ -5,7 +5,8 @@ from jwt import PyJWKClient
 from config import client_id
 import string
 from typing import Tuple, Optional
-from config import odic_provider, client_id
+from config import odic_provider, client_id, client_secret, redirect_uri
+import requests
 
 letters = list(string.ascii_letters)
 
@@ -46,3 +47,19 @@ def decode_token(token: str, jwks_uri: str) -> Optional[dict]:
     if data["iss"] != odic_provider or data["aud"] != client_id:
         return None
     return data
+
+
+def retrieve_token(code, endpoint):
+    data = {
+        "grant_type": "authorization_code",
+        "client_id": client_id,
+        "client_secret": client_secret,
+        "code": code,
+        "redirect_uri": redirect_uri,
+    }
+    res = requests.post(endpoint, data=data)
+    print(res.json())
+    if res.status_code != 200:
+        return
+    token = res.json()["id_token"]
+    return token

@@ -1,5 +1,5 @@
 provider = "my-provider"
-
+port = 5001
 credentials = {
     "google": {
         "base_url": "https://accounts.google.com",
@@ -12,7 +12,7 @@ credentials = {
         "secret": "client secret",
     },
     "my-provider": {
-        "base_url": "https://identity-provider.up.railway.app",  # this is always different for different application
+        "base_url": "http://localhost:5000",  # credentials for my identity provider hosted on railway
         "id": "KgwZin4eDNrWv4miaVxrGn",
         "secret": "4fUYvcZbEpNYCNkR96ypEZ",
     },
@@ -22,4 +22,4 @@ credentials = {
 odic_provider = credentials[provider]["base_url"]
 client_id = credentials[provider]["id"]
 client_secret = credentials[provider]["secret"]
-redirect_uri = "http://127.0.0.1:5001/callback"
+redirect_uri = f"http://127.0.0.1:{port}/callback"

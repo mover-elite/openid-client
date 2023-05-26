@@ -6,10 +6,10 @@ from flask import (
     url_for,
     make_response,
 )
-from utils import login_user, retrieve_user, database, decode_token
+from utils import login_user, retrieve_user, database, decode_token, retrieve_token
 from dotenv import load_dotenv
 import json, requests, secrets
-from config import odic_provider, client_id, client_secret, redirect_uri
+from config import odic_provider, client_id, redirect_uri, port
 
 
 load_dotenv()
@@ -30,7 +30,7 @@ def home():
 @app.route("/login")
 def login():
     authorizationEndpoint = oidc_provider_configuration["authorization_endpoint"]
-    response_type = "id_token"
+    response_type = "code"
     scope = "openid email"
 
     response_mode = "form_post"
@@ -52,26 +52,23 @@ def login():
 def handle_callback():
     if request.method == "POST":
         token = request.form.get("id_token", "")
+        if not token:
+            code = request.form["code"]
+            token = retrieve_token(code, oidc_provider_configuration["token_endpoint"])
     else:
-        code = request.args.get("code")
-        data = {
-            "grant_type": "authorization_code",
-            "client_id": client_id,
-            "client_secret": client_secret,
-            "code": code,
-            "redirect_uri": redirect_uri,
-        }
+        token = request.args.get("id_token", "")
+        if not token:
+            code = request.args.get("code")
+            print(code)
+            token = retrieve_token(code, oidc_provider_configuration["token_endpoint"])
 
-        res = requests.post(oidc_provider_configuration["token_endpoint"], data=data)
-        print(res.json())
-        if res.status_code != 200:
-            return "Unable to login"
-        token = res.json()["id_token"]
+    if not token:
+        return "Unable to login"
 
     data = decode_token(token, oidc_provider_configuration["jwks_uri"])
     if not data:
         return "Token Corrupted"
-
+    print(data)
     set_nonce = request.cookies.get("auth-nonce", "")
     if set_nonce != data["nonce"]:
         return "Session spoofed"
@@ -105,7 +102,7 @@ if __name__ == "__main__":
     try:
         res = requests.get(f"{odic_provider}/.well-known/openid-configuration")
         oidc_provider_configuration = res.json()
-        app.run(debug=True, port=5001)
+        app.run(debug=True, port=port)
     except Exception as e:
         print(e)
         print("Couldn't connect to the OpenID provider for configuration")
