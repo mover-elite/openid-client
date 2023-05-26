@@ -42,6 +42,7 @@ def decode_token(token: str, jwks_uri: str) -> Optional[dict]:
         audience=client_id,
         options={"verify_exp": True},
     )
+    print(data)
     if data["iss"] != odic_provider or data["aud"] != client_id:
         return None
     return data

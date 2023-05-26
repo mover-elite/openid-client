@@ -105,7 +105,7 @@ if __name__ == "__main__":
     try:
         res = requests.get(f"{odic_provider}/.well-known/openid-configuration")
         oidc_provider_configuration = res.json()
-        app.run(debug=True, port=5000)
+        app.run(debug=True, port=5001)
     except Exception as e:
         print(e)
         print("Couldn't connect to the OpenID provider for configuration")

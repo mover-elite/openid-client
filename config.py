@@ -1,4 +1,4 @@
-provider = "google"
+provider = "my-provider"
 
 credentials = {
     "google": {
@@ -11,10 +11,15 @@ credentials = {
         "id": "client id",
         "secret": "client secret",
     },
+    "my-provider": {
+        "base_url": "https://identity-provider.up.railway.app",  # this is always different for different application
+        "id": "KgwZin4eDNrWv4miaVxrGn",
+        "secret": "4fUYvcZbEpNYCNkR96ypEZ",
+    },
 }
 
 
 odic_provider = credentials[provider]["base_url"]
 client_id = credentials[provider]["id"]
 client_secret = credentials[provider]["secret"]
-redirect_uri = "http://127.0.0.1:5000/callback"
+redirect_uri = "http://127.0.0.1:5001/callback"
